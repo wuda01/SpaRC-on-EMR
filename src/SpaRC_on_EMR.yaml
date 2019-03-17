@@ -1,0 +1,23 @@
+config:
+  EMR_CLUSTER_NAME: "SpaRC-Test"
+  EMR_RELEASE: "emr-5.17.0"
+  KEY_NAME: "wuda01"
+  PATH_TO_KEY: "/home/wuda/"
+  INSTANCE_TYPE: "r5.xlarge"
+  CORE_COUNT: "1"
+  SUBNET_ID: "subnet-01a65bbdd29523d1a"
+  SLAVE_SECURITY_GROUP: ""
+  MASTER_SECURITY_GROUP: ""
+  BIG_PRICE: "0.2"
+  EC2_NAME_TAG: "SpaRC-EMR"
+  PROJECT_TAG: "SpaRC-project"
+  MASTER_VOL: "32"
+  CORE_VOL: "32"
+  S3_BUCKET: "s3://aws-logs-412986692990-us-east-1"
+  BOOTSTRAP: "s3://sparkAssembler/artifacts/emr-boostrap-sparc-jupyter-cached.sh"
+  PATH_TO_SPARC: "/home/wuda/桌面/SpaRC-on-EMR/src/"
+  SPARC_JAR: "LocalCluster-assembly-0.1-08.jar"
+  
+ # a location in Amazon S3 or a local path starting with 'file:'
+
+
