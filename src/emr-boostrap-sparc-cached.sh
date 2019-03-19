@@ -40,15 +40,15 @@ if [ "$IS_MASTER" = true ]; then
 	#  2. yum-dependencies
 	#  3. sparc
 
-	#cached="s3://sparkAssembler/artifacts/sparc.zip"
+	cached="s3://sparkAssembler/artifacts/sparc.zip"
 
-	#mkdir /mnt/sparc
-	#cd /mnt/sparc
-	#aws s3 cp ${cached} sparc.zip
-	#unzip sparc.zip
-	#rm sparc.zip
-	#cd /mnt
-	#sudo mv /mnt/sparc /usr/local/share/ 
+	mkdir /mnt/sparc
+	cd /mnt/sparc
+	aws s3 cp ${cached} sparc.zip
+	unzip sparc.zip
+	rm sparc.zip
+	cd /mnt
+	sudo mv /mnt/sparc /usr/local/share/ 
 
 	# install zstd
 	sudo yum install git -y

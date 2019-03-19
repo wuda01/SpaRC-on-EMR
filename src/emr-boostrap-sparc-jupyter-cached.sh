@@ -1,12 +1,16 @@
 #!/bin/bash
 set -x -e
 
+# AWS EMR bootstrap script 
+NOTEBOOK_DIR="s3://wuda-notebook/notebook"
+
 # check for master node
 IS_MASTER=false
 if grep isMaster /mnt/var/lib/info/instance.json | grep true;
 then
   IS_MASTER=true
 fi
+
 
 # change a few system parameters
 sudo bash -c 'echo "fs.file-max = 25129162" >> /etc/sysctl.conf'
@@ -30,6 +34,7 @@ if [ ! -d /mnt/usr-moved ]; then
   echo "move home end" >> /tmp/install_time.log
   date >> /tmp/install_time.log
 fi
+
 
 PYTHON3=false
 if [ "$PYTHON3" = true ]; then # this will break bigtop/puppet which relies on python 2, so disable with the line above
@@ -76,18 +81,6 @@ source ~/.bashrc
 # only run below on master instance
 if [ "$IS_MASTER" = true ]; then
 
-	# copy files needed
-
-	#cached="s3://sparkAssembler/artifacts/sparc.zip"
-
-	#mkdir /mnt/sparc
-	#cd /mnt/sparc
-	#aws s3 cp ${cached} sparc.zip
-	#unzip sparc.zip
-	#rm sparc.zip
-	#cd /mnt
-	#sudo mv /mnt/sparc /usr/local/share/ 
-
 	# install zstd
 	sudo yum install git -y
 	git clone https://github.com/facebook/zstd.git
@@ -115,6 +108,41 @@ if [ "$IS_MASTER" = true ]; then
 	echo "c.NotebookApp.token = u''" >> ~/.jupyter/jupyter_notebook_config.py
 	echo "c.Authenticator.admin_users = u''" >> ~/.jupyter/jupyter_notebook_config.py
 	echo "c.LocalAuthenticator.create_system_users = True" >> ~/.jupyter/jupyter_notebook_config.py
+	
+	
+        if [ ! "$NOTEBOOK_DIR" = "" ]; then
+
+          NOTEBOOK_DIR="${NOTEBOOK_DIR%/}/" # remove trailing / if exists then add /
+          if [[ "$NOTEBOOK_DIR" == s3://* ]]; then
+            NOTEBOOK_DIR_S3=true
+            if [ true = true ]; then
+              BUCKET=$(ruby -e "puts '$NOTEBOOK_DIR'.split('//')[1].split('/')[0]")
+              FOLDER=$(ruby -e "puts '$NOTEBOOK_DIR'.split('//')[1].split('/')[1..-1].join('/')")
+              if [ "$USE_CACHED_DEPS" != true ]; then
+                sudo yum install -y automake fuse fuse-devel libxml2-devel git libcurl-devel jsoncpp-devel
+              fi
+              cd /mnt
+              rm -fr s3fs-fuse
+              git clone https://github.com/s3fs-fuse/s3fs-fuse.git
+              cd s3fs-fuse/
+              ls -alrt
+              ./autogen.sh
+              ./configure
+              make
+              sudo make install
+              sudo su -c 'echo user_allow_other >> /etc/fuse.conf'
+              mkdir -p /mnt/s3fs-cache
+              mkdir -p /mnt/$BUCKET
+              /usr/local/bin/s3fs -o allow_other -o iam_role=auto -o umask=0 -o url=https://s3.amazonaws.com  -o no_check_certificate -o enable_noobj_cache -o use_cache=/mnt/s3fs-cache $BUCKET /mnt/$BUCKET
+              echo "c.NotebookApp.notebook_dir = '/mnt/$BUCKET/$FOLDER'" >> ~/.jupyter/jupyter_notebook_config.py
+              echo "c.ContentsManager.checkpoints_kwargs = {'root_dir': '.checkpoints'}" >> ~/.jupyter/jupyter_notebook_config.py
+            fi
+          else
+            echo "c.NotebookApp.notebook_dir = '$NOTEBOOK_DIR'" >> ~/.jupyter/jupyter_notebook_config.py
+            echo "c.ContentsManager.checkpoints_kwargs = {'root_dir': '.checkpoints'}" >> ~/.jupyter/jupyter_notebook_config.py
+          fi
+        fi
+
 
 	# install default kernels
 	sudo python3 -m pip install notebook ipykernel
