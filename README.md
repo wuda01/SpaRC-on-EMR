@@ -21,9 +21,7 @@ b) **A configured `CLI` account**. If your `CLI` account has been previously con
 
 ## EMR `cloudformation`
 
-Open your terminal and clone this repository: `git clone https://github.com/hms-dbmi/hail-on-EMR`. 
- 
-1. `cd` into the `SpaRC-on-EMR/src` folder and with the text editor of your preference open the configuration file: `SpaRC_on_EMR.yaml`. This file will be used to provide information necessary to create the cluster. Fill in the fields as necessary using your personal key and security groups (SG) information and save your changes. See configuration details below:
+1. `cd` into the `SpaRC-on-EMR/src` folder and with the text editor of your preference open the configuration file: `emr_config.yaml`. This file will be used to provide information necessary to create the cluster. Fill in the fields as necessary using your personal key and security groups (SG) information and save your changes. See configuration details below:
 
 ```yaml
 config:
@@ -62,7 +60,7 @@ For additional configuration details regarding the **emr** release, visit: <http
 
 See additional instance details at: https://aws.amazon.com/ec2/instance-types/
 
-2. Execute the command: `sh sparc_cloudformation_emr.sh`. The EMR creation takes between 5-7 minutes. The installation log file is located at `tail -f /tmp/cloudcreation_log.out`; the logs are available, under the same path, at both the local installation computer and at the master node of your EMR
+2. Execute the command: `sh run.sh`. The EMR creation takes between 15-20 minutes. 
 3. You can check the status of the EMR creation at: https://console.aws.amazon.com/elasticmapreduce/home?region=us-east-1. The EMR is successfully created once it gets the status `Waiting`. After created, you can do your analysis.
 
 
