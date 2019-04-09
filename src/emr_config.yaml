@@ -1,0 +1,17 @@
+config:
+  EMR_CLUSTER_NAME: "SpaRC-Test"
+  EMR_RELEASE: "emr-5.17.0"
+  KEY_NAME: "wuda01"
+  PATH_TO_KEY: "/home/wuda/"
+  INSTANCE_TYPE: "r5.xlarge"
+  CORE_COUNT: "1"
+  BIG_PRICE: "0.2"
+  MASTER_VOL: "32"
+  CORE_VOL: "32"
+  S3_BUCKET: "s3://wuda-notebook/logs"
+  BOOTSTRAP: "s3://wuda-notebook/bash/emr-boostrap-sparc-jupyter-cached.sh"
+  BOOTSTRAP_ARGS: "--notebook-dir,s3://wuda-notebook/jupyter_notebook"
+  SPARC_JAR: "s3://wuda-notebook/jupyter_notebook/GlobalCluster-assembly-0.2.jar"
+
+
+
