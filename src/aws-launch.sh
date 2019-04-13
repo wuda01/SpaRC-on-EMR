@@ -1,6 +1,6 @@
 #!/bin/bash -x -e
 
-echo -e "Generating the EMR cluster/n"
+echo -e "Generating the EMR cluster\n"
 
 #pip install --upgrade pip
 
@@ -14,7 +14,7 @@ if [ -z "$CREDENTIALS" ]; then
 	echo "For help visit:"
 	echo "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html"
 	echo "See your accessKeys.csv file to find the Access Keys"
-	echo -e "Your inputs should look like this:/n"
+	echo -e "Your inputs should look like this:\n"
 	echo "AWS Access Key ID [None]: AKIAIEXAMPLEKEY"
 	echo "AWS Secret Access Key [None]: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 	echo "Default region name [None]: us-east-1"
@@ -22,7 +22,7 @@ if [ -z "$CREDENTIALS" ]; then
 	aws configure
 else 
 	echo "Using existing AWS credentials..."
-	echo -e "To reconfigure run: aws configure/n"
+	echo -e "To reconfigure run: aws configure\n"
 fi
 
 #echo "Installing required packages"
@@ -32,4 +32,4 @@ fi
 #pip install -Iv greenlet==0.4.13 -q
 
 echo "Starting EMR cluster. This operation takes 15-20 minutes..."
-python start_emr.py
+python /home/wuda/SpaRC/sparc-on-emr/src/emr_start.py

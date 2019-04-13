@@ -55,11 +55,6 @@ command='scp -o \'StrictHostKeyChecking no\' -i '+c['config']['PATH_TO_KEY']+c['
 os.system(command)
 print('Copying keys...')
 
-# Copy the files needed into the master
-#command='scp -o \'StrictHostKeyChecking no\' -i '+c['config']['PATH_TO_KEY']+c['config']['KEY_NAME']+'.pem '+c['config']['SPARC_JAR']+'  hadoop@'+master_dns+':/home/hadoop'
-#os.system(command)
-#print('Copying files...')
-
 # log in the emr
 command= 'ssh -i '+c['config']['PATH_TO_KEY']+c['config']['KEY_NAME']+'.pem -L 8888:localhost:8888 hadoop@'+master_dns 
 os.system(command)
