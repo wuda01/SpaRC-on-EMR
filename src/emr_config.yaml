@@ -9,7 +9,7 @@ config:
   MASTER_VOL: "32"
   CORE_VOL: "32"
   S3_BUCKET: "s3://wuda-notebook/logs"
-  BOOTSTRAP: "s3://wuda-notebook/bash/emr-boostrap-sparc-jupyter-cached.sh"
-  BOOTSTRAP_ARGS: ""
+  BOOTSTRAP: "file:///home/wuda/SpaRC/sparc-on-emr/src/emr-boostrap.sh"
+  BOOTSTRAP_ARGS: "--notebook-dir,s3://wuda-notebook/jupyter_notebook"
 
 
