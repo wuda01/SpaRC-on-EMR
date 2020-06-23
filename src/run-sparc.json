@@ -1,0 +1,217 @@
+[
+    {
+        "Name": "SeqAddId",
+        "Type": "Spark",
+        "ActionOnFailure": "CONTINUE",
+        "Args": [
+            "--class", "org.jgi.spark.localcluster.tools.SeqAddId",
+            "--deploy-mode", "cluster",
+            "--master", "yarn",
+            "--executor-cores", "3",
+            "--executor-memory", "10G",
+            "--num-executors", "3",
+            "--conf", "spark.driver.maxResultSize=8g",
+            "--conf", "spark.network.timeout=360000",
+            "--conf", "spark.speculation=true",
+            "--conf", "spark.default.parallelism=100",
+            "s3://wuda-notebook/jupyter_notebook/GlobalCluster-assembly-0.2.jar",
+            "-i", "s3://wuda-notebook/jupyter_notebook/sample9.seq,s3://wuda-notebook/jupyter_notebook/sample13.seq,s3://wuda-notebook/jupyter_notebook/sample16.seq,s3://wuda-notebook/jupyter_notebook/sample18.seq,s3://wuda-notebook/jupyter_notebook/sample20.seq,s3://wuda-notebook/jupyter_notebook/sample28.seq,s3://wuda-notebook/jupyter_notebook/sample32.seq,s3://wuda-notebook/jupyter_notebook/sample34.seq,s3://wuda-notebook/jupyter_notebook/sample38.seq,s3://wuda-notebook/jupyter_notebook/sample41.seq",
+            "-o", "seqaddid_output",
+            "--flag", "GLOBAL",
+            "-n", "1"
+            ]
+    },
+
+    {
+        "Name": "MinimizerMapReads",
+        "Type": "Spark",
+        "ActionOnFailure": "CONTINUE",
+        "Args": [
+            "--class", "org.jgi.spark.localcluster.tools.MinimizerMapReads",
+            "--deploy-mode", "cluster",
+            "--master", "yarn",
+            "--executor-cores", "3",
+            "--executor-memory", "10G",
+            "--num-executors", "3",
+            "--conf", "spark.driver.maxResultSize=8g",
+            "--conf", "spark.network.timeout=360000",
+            "--conf", "spark.speculation=true",
+            "--conf", "spark.default.parallelism=100",
+            "s3://wuda-notebook/jupyter_notebook/GlobalCluster-assembly-0.2.jar",
+            "-i", "seqaddid_output",
+            "--minimizer", "minimizer",
+            "--gc_minimizer", "global_minimizer",
+            "-k", "31",
+            "-m", "25",
+            "-w", "20",
+            "--flag", "GLOBAL",
+            "--n_iteration", "1"
+            ]
+    },
+
+    {
+        "Name": "GraphGen2",
+        "Type": "Spark",
+        "ActionOnFailure": "CONTINUE",
+        "Args": [
+            "--class", "org.jgi.spark.localcluster.tools.GraphGen2",
+            "--deploy-mode", "cluster",
+            "--master", "yarn",
+            "--executor-cores", "3",
+            "--executor-memory", "10G",
+            "--num-executors", "3",
+            "--conf", "spark.driver.maxResultSize=8g",
+            "--conf", "spark.network.timeout=360000",
+            "--conf", "spark.speculation=true",
+            "--conf", "spark.default.parallelism=100",
+            "s3://wuda-notebook/jupyter_notebook/GlobalCluster-assembly-0.2.jar",
+            "-i", "minimizer",
+            "-o", "graphgen2_output",
+            "--min_shared_kmers", "2",
+            "--max_degree", "100",
+            "--n_iteration", "1"
+            ]
+    },
+
+    {
+        "Name": "GraphLPA3",
+        "Type": "Spark",
+        "ActionOnFailure": "CONTINUE",
+        "Args": [
+            "--class", "org.jgi.spark.localcluster.tools.GraphLPA3",
+            "--deploy-mode", "cluster",
+            "--master", "yarn",
+            "--executor-cores", "3",
+            "--executor-memory", "10G",
+            "--num-executors", "3",
+            "--conf", "spark.driver.maxResultSize=8g",
+            "--conf", "spark.network.timeout=360000",
+            "--conf", "spark.speculation=true",
+            "--conf", "spark.default.parallelism=100",
+            "s3://wuda-notebook/jupyter_notebook/GlobalCluster-assembly-0.2.jar",
+            "-i", "graphgen2_output",
+            "-o", "graphlpa3_output",
+            "--min_shared_kmers", "2",
+            "--max_shared_kmers", "20000",
+            "--min_reads_per_cluster", "0",
+            "--max_iteration", "10",
+            "--weight", "edge"
+            ]
+    },
+
+    {
+        "Name": "GlobalClustering",
+        "Type": "Spark",
+        "ActionOnFailure": "CONTINUE",
+        "Args": [
+            "--class", "org.jgi.spark.localcluster.tools.GlobalClustering",
+            "--deploy-mode", "cluster",
+            "--master", "yarn",
+            "--executor-cores", "3",
+            "--executor-memory", "10G",
+            "--num-executors", "3",
+            "--conf", "spark.driver.maxResultSize=8g",
+            "--conf", "spark.network.timeout=360000",
+            "--conf", "spark.speculation=true",
+            "--conf", "spark.default.parallelism=100",
+            "s3://wuda-notebook/jupyter_notebook/GlobalCluster-assembly-0.2.jar",
+            "--lpa_input", "graphlpa3_output",
+            "--mini_input", "global_minimizer",
+            "-o", "globalcluster_output",
+            "--jars", "1,2,3,4,5,6,7,8,9,10",
+            "--kmercount", "10",
+            "--filter", "0.2",
+            "--n_partition", "1",
+            "--n_block", "1"
+            ]
+    },
+
+    {
+        "Name": "GlobalClustering => GraphLPA3",
+        "Type": "Spark",
+        "ActionOnFailure": "CONTINUE",
+        "Args": [
+            "--class", "org.jgi.spark.localcluster.tools.GraphLPA3",
+            "--deploy-mode", "cluster",
+            "--master", "yarn",
+            "--executor-cores", "3",
+            "--executor-memory", "10G",
+            "--num-executors", "3",
+            "--conf", "spark.driver.maxResultSize=8g",
+            "--conf", "spark.network.timeout=360000",
+            "--conf", "spark.speculation=true",
+            "--conf", "spark.default.parallelism=100",
+            "s3://wuda-notebook/jupyter_notebook/GlobalCluster-assembly-0.2.jar",
+            "-i", "globalcluster_output",
+            "-o", "graphlpa3_global_output",
+            "--min_shared_kmers", "0",
+            "--max_shared_kmers", "20000",
+            "--min_reads_per_cluster", "0",
+            "--max_iteration", "10",
+            "--weight", "edge"
+            ]
+    },
+
+    {
+        "Name": "CCAddSeq",
+        "Type": "Spark",
+        "ActionOnFailure": "CONTINUE",
+        "Args": [
+            "--class", "org.jgi.spark.localcluster.tools.CCAddSeq",
+            "--deploy-mode", "cluster",
+            "--master", "yarn",
+            "--executor-cores", "3",
+            "--executor-memory", "10G",
+            "--num-executors", "3",
+            "--conf", "spark.driver.maxResultSize=8g",
+            "--conf", "spark.network.timeout=360000",
+            "--conf", "spark.speculation=true",
+            "--conf", "spark.default.parallelism=100",
+            "s3://wuda-notebook/jupyter_notebook/GlobalCluster-assembly-0.2.jar",
+            "--flag", "GLOBAL",
+            "-i", "graphlpa3_global_output",
+            "-o", "ccaddseq_output",
+            "--reads", "seqaddid_output",
+            "--local_lpa", "graphlpa3_output"
+            ]
+    },
+
+    {
+        "Name": "Metric",
+        "Type": "Spark",
+        "ActionOnFailure": "CONTINUE",
+        "Args": [
+            "--class", "org.jgi.spark.localcluster.tools.Metric",
+            "--deploy-mode", "cluster",
+            "--master", "yarn",
+            "--executor-cores", "3",
+            "--executor-memory", "10G",
+            "--num-executors", "3",
+            "--conf", "spark.driver.maxResultSize=8g",
+            "--conf", "spark.network.timeout=360000",
+            "--conf", "spark.speculation=true",
+            "--conf", "spark.default.parallelism=100",
+            "s3://wuda-notebook/jupyter_notebook/GlobalCluster-assembly-0.2.jar",
+            "--flag", "CAMI",
+            "-l", "ccaddseq_output",
+            "-k", "s3://wuda-notebook/jupyter_notebook/label1000",
+            "-o", "metric_output",
+            "-n", "2"
+            ]
+    },
+    
+    
+    
+    {
+        "Name":"save the results",
+        "Type":"CUSTOM_JAR",
+        "Jar":"s3://us-east-1.elasticmapreduce/libs/script-runner/script-runner.jar",
+        "ActionOnFailure":"CONTINUE",
+        "Args": [
+            "s3://wuda-notebook/bash/save-results.sh",
+            "--save-results", "s3://wuda-notebook/results"
+        ]  
+    }
+    
+  
+]
